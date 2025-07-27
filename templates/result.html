@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - AI Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+        .sentiment-positive { border-left: 5px solid #28a745; }
+        .sentiment-negative { border-left: 5px solid #dc3545; }
+        .sentiment-neutral { border-left: 5px solid #ffc107; }
+        .score-bar {
+            height: 20px;
+            border-radius: 10px;
+            background: #e9ecef;
+            overflow: hidden;
+        }
+        .score-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        .positive-fill { background: linear-gradient(90deg, #28a745, #20c997); }
+        .negative-fill { background: linear-gradient(90deg, #dc3545, #e83e8c); }
+        .neutral-fill { background: linear-gradient(90deg, #ffc107, #fd7e14); }
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .title {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <h1 class="text-center mb-4 title">
+                    <i class="fas fa-chart-bar me-3"></i>
+                    Analysis Results
+                </h1>
+                
+                <!-- Original Text -->
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5><i class="fas fa-quote-left me-2"></i>Original Text</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">{{ original_text }}</p>
+                    </div>
+                </div>
+                
+                <!-- Sentiment Analysis -->
+                <div class="card sentiment-{{ sentiment_result.sentiment.lower() }}">
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="fas fa-heart me-2"></i>Sentiment Analysis</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    {% if sentiment_result.sentiment == 'Positive' %}
+                                        <i class="fas fa-smile text-success fa-3x mb-2"></i>
+                                    {% elif sentiment_result.sentiment == 'Negative' %}
+                                        <i class="fas fa-frown text-danger fa-3x mb-2"></i>
+                                    {% else %}
+                                        <i class="fas fa-meh text-warning fa-3x mb-2"></i>
+                                    {% endif %}
+                                    <h4 class="mb-0">{{ sentiment_result.sentiment }}</h4>
+                                    <small class="text-muted">Overall Sentiment</small>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="fw-bold text-success">Positive: {{ "%.2f"|format(sentiment_result.scores.pos) }}</label>
+                                    <div class="score-bar">
+                                        <div class="score-fill positive-fill" style="width: {{ sentiment_result.scores.pos * 100 }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="fw-bold text-warning">Neutral: {{ "%.2f"|format(sentiment_result.scores.neu) }}</label>
+                                    <div class="score-bar">
+                                        <div class="score-fill neutral-fill" style="width: {{ sentiment_result.scores.neu * 100 }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="fw-bold text-danger">Negative: {{ "%.2f"|format(sentiment_result.scores.neg) }}</label>
+                                    <div class="score-bar">
+                                        <div class="score-fill negative-fill" style="width: {{ sentiment_result.scores.neg * 100 }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="fw-bold text-primary">Compound Score: {{ "%.2f"|format(sentiment_result.scores.compound) }}</label>
+                                    <div class="score-bar">
+                                        <div class="score-fill {% if sentiment_result.scores.compound > 0 %}positive-fill{% elif sentiment_result.scores.compound < 0 %}negative-fill{% else %}neutral-fill{% endif %}" 
+                                             style="width: {{ ((sentiment_result.scores.compound + 1) / 2) * 100 }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Generated Text -->
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-robot me-2"></i>AI Generated Text</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">{{ generated_text }}</p>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Generated using GPT-2 model based on your input text
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Back Button -->
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Analyze New Text
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
