@@ -1,45 +1,61 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, jsonify
 import nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 import torch
+import warnings
+
+# Suppress warnings
+warnings.filterwarnings("ignore")
 
 app = Flask(__name__)
 
-# Initialize models
+# Initialize sentiment analyzer
 try:
-    nltk.data.find('vader_lexicon')
+    analyzer = SentimentIntensityAnalyzer()
 except LookupError:
     nltk.download('vader_lexicon')
+    analyzer = SentimentIntensityAnalyzer()
 
-sia = SentimentIntensityAnalyzer()
-
-# Load GPT-2 model and tokenizer
+# Initialize GPT-2 model and tokenizer
+print("Loading GPT-2 model...")
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
 model = GPT2LMHeadModel.from_pretrained('gpt2')
+
+# Add pad token to tokenizer
 tokenizer.pad_token = tokenizer.eos_token
 
+print("Model loaded successfully!")
+
 def analyze_sentiment(text):
-    """Analyze sentiment using NLTK's Vader"""
-    scores = sia.polarity_scores(text)
+    """Analyze sentiment of the given text"""
+    scores = analyzer.polarity_scores(text)
     
     # Determine overall sentiment
-    if scores['compound'] >= 0.05:
-        sentiment = 'Positive'
-    elif scores['compound'] <= -0.05:
-        sentiment = 'Negative'
+    compound = scores['compound']
+    if compound >= 0.05:
+        overall = 'Positive'
+        color = 'success'
+    elif compound <= -0.05:
+        overall = 'Negative'
+        color = 'danger'
     else:
-        sentiment = 'Neutral'
+        overall = 'Neutral'
+        color = 'warning'
     
     return {
-        'sentiment': sentiment,
-        'scores': scores
+        'positive': scores['pos'],
+        'negative': scores['neg'],
+        'neutral': scores['neu'],
+        'compound': scores['compound'],
+        'overall': overall,
+        'color': color
     }
 
 def generate_text(prompt, max_length=100):
-    """Generate text using GPT-2"""
+    """Generate text using GPT-2 model"""
     try:
-        # Encode input text
+        # Encode the prompt
         inputs = tokenizer.encode(prompt, return_tensors='pt', max_length=512, truncation=True)
         
         # Generate text
@@ -48,41 +64,64 @@ def generate_text(prompt, max_length=100):
                 inputs,
                 max_length=len(inputs[0]) + max_length,
                 num_return_sequences=1,
-                temperature=0.7,
+                temperature=0.8,
                 do_sample=True,
-                pad_token_id=tokenizer.eos_token_id
+                pad_token_id=tokenizer.eos_token_id,
+                no_repeat_ngram_size=2,
+                top_p=0.9
             )
         
-        # Decode generated text
+        # Decode the generated text
         generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
         
-        # Return only the generated part (remove the original prompt)
-        return generated_text[len(prompt):].strip()
+        # Remove the original prompt from the generated text
+        generated_text = generated_text[len(prompt):].strip()
+        
+        return generated_text
     
     except Exception as e:
         return f"Error generating text: {str(e)}"
 
 @app.route('/')
 def index():
+    """Home page"""
     return render_template('index.html')
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    user_text = request.form.get('text', '').strip()
+    """Analyze text and generate additional content"""
+    text = request.form.get('text', '').strip()
     
-    if not user_text:
-        return redirect(url_for('index'))
+    if not text:
+        return render_template('index.html', error="Please enter some text to analyze.")
     
     # Perform sentiment analysis
-    sentiment_result = analyze_sentiment(user_text)
+    sentiment = analyze_sentiment(text)
     
     # Generate additional text
-    generated_text = generate_text(user_text, max_length=80)
+    generated = generate_text(text)
     
     return render_template('result.html', 
-                         original_text=user_text,
-                         sentiment_result=sentiment_result,
-                         generated_text=generated_text)
+                         original_text=text,
+                         sentiment=sentiment,
+                         generated_text=generated)
+
+@app.route('/api/analyze', methods=['POST'])
+def api_analyze():
+    """API endpoint for text analysis"""
+    data = request.get_json()
+    text = data.get('text', '').strip()
+    
+    if not text:
+        return jsonify({'error': 'No text provided'}), 400
+    
+    sentiment = analyze_sentiment(text)
+    generated = generate_text(text)
+    
+    return jsonify({
+        'sentiment': sentiment,
+        'generated_text': generated
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
