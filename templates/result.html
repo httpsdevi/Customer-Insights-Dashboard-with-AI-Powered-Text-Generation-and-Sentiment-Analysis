@@ -3,148 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analysis Results - AI Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Analysis Results - AI Text Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .card {
-            border: none;
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .header-icon {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .result-card {
+            background: white;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            border-left: 5px solid;
         }
-        .sentiment-positive { border-left: 5px solid #28a745; }
-        .sentiment-negative { border-left: 5px solid #dc3545; }
-        .sentiment-neutral { border-left: 5px solid #ffc107; }
-        .score-bar {
-            height: 20px;
-            border-radius: 10px;
-            background: #e9ecef;
+        .text-card { border-left-color: #17a2b8; }
+        .sentiment-card { border-left-color: #28a745; }
+        .generated-card { border-left-color: #6f42c1; }
+        
+        .sentiment-bar {
+            height: 25px;
+            border-radius: 12px;
+            position: relative;
             overflow: hidden;
+            background: #f8f9fa;
         }
-        .score-fill {
+        .sentiment-fill {
             height: 100%;
-            transition: width 0.5s ease;
+            border-radius: 12px;
+            transition: width 0.8s ease-in-out;
+            position: relative;
         }
-        .positive-fill { background: linear-gradient(90deg, #28a745, #20c997); }
-        .negative-fill { background: linear-gradient(90deg, #dc3545, #e83e8c); }
-        .neutral-fill { background: linear-gradient(90deg, #ffc107, #fd7e14); }
-        .btn-secondary {
-            background: linear-gradient(45deg, #6c757d, #495057);
-            border: none;
-            border-radius: 25px;
-            padding: 12px 30px;
-        }
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .title {
+        .sentiment-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 600;
+            font-size: 0.9rem;
             color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .score-badge {
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+        .overall-sentiment {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 1rem 0;
+        }
+        .btn-new-analysis {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .btn-new-analysis:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        .text-gradient {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .original-text {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 4px solid #17a2b8;
+            font-style: italic;
+            line-height: 1.6;
+        }
+        .generated-text {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: #f1f3f4;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 4px solid #6f42c1;
+            line-height: 1.6;
+        }
+        .metric-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .metric-label {
+            min-width: 100px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #667eea;
+            border-radius: 8px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .copy-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
-    <div class="container mt-4">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-10">
-                <h1 class="text-center mb-4 title">
-                    <i class="fas fa-chart-bar me-3"></i>
-                    Analysis Results
-                </h1>
-                
-                <!-- Original Text -->
-                <div class="card">
-                    <div class="card-header bg-info text-white">
-                        <h5><i class="fas fa-quote-left me-2"></i>Original Text</h5>
+            <div class="col-lg-10">
+                <div class="main-container fade-in">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <i class="fas fa-chart-line header-icon"></i>
+                        <h1 class="h2 fw-bold text-gradient mb-2">Analysis Results</h1>
+                        <p class="text-muted">Comprehensive sentiment analysis and AI-generated content</p>
                     </div>
-                    <div class="card-body">
-                        <p class="lead">{{ original_text }}</p>
+
+                    <!-- Original Text Card -->
+                    <div class="result-card text-card">
+                        <h3 class="h4 mb-3">
+                            <i class="fas fa-file-text text-info me-2"></i>Original Text
+                            <button class="copy-btn" onclick="copyText('original-text')" title="Copy text">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </h3>
+                        <div class="original-text" id="original-text">
+                            {{ original_text }}
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Sentiment Analysis -->
-                <div class="card sentiment-{{ sentiment_result.sentiment.lower() }}">
-                    <div class="card-header bg-primary text-white">
-                        <h5><i class="fas fa-heart me-2"></i>Sentiment Analysis</h5>
-                    </div>
-                    <div class="card-body">
+
+                    <!-- Sentiment Analysis Card -->
+                    <div class="result-card sentiment-card">
+                        <h3 class="h4 mb-4">
+                            <i class="fas fa-heart text-success me-2"></i>Sentiment Analysis
+                        </h3>
+                        
+                        <!-- Overall Sentiment -->
+                        <div class="text-center mb-4">
+                            <div class="overall-sentiment bg-{{ sentiment.color }} text-white">
+                                <i class="fas fa-{{ 'smile' if sentiment.overall == 'Positive' else 'meh' if sentiment.overall == 'Neutral' else 'frown' }} me-2"></i>
+                                {{ sentiment.overall }} Sentiment
+                            </div>
+                        </div>
+
+                        <!-- Detailed Scores -->
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="text-center">
-                                    {% if sentiment_result.sentiment == 'Positive' %}
-                                        <i class="fas fa-smile text-success fa-3x mb-2"></i>
-                                    {% elif sentiment_result.sentiment == 'Negative' %}
-                                        <i class="fas fa-frown text-danger fa-3x mb-2"></i>
-                                    {% else %}
-                                        <i class="fas fa-meh text-warning fa-3x mb-2"></i>
-                                    {% endif %}
-                                    <h4 class="mb-0">{{ sentiment_result.sentiment }}</h4>
-                                    <small class="text-muted">Overall Sentiment</small>
+                            <div class="col-md-6">
+                                <!-- Positive Score -->
+                                <div class="metric-row">
+                                    <div class="metric-label">Positive:</div>
+                                    <div class="flex-grow-1 mx-3">
+                                        <div class="sentiment-bar">
+                                            <div class="sentiment-fill bg-success" style="width: {{ (sentiment.positive * 100)|round(1) }}%">
+                                                <div class="sentiment-text">{{ (sentiment.positive * 100)|round(1) }}%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="score-badge bg-success text-white">{{ sentiment.positive|round(3) }}</span>
+                                </div>
+
+                                <!-- Negative Score -->
+                                <div class="metric-row">
+                                    <div class="metric-label">Negative:</div>
+                                    <div class="flex-grow-1 mx-3">
+                                        <div class="sentiment-bar">
+                                            <div class="sentiment-fill bg-danger" style="width: {{ (sentiment.negative * 100)|round(1) }}%">
+                                                <div class="sentiment-text">{{ (sentiment.negative * 100)|round(1) }}%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="score-badge bg-danger text-white">{{ sentiment.negative|round(3) }}</span>
                                 </div>
                             </div>
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="fw-bold text-success">Positive: {{ "%.2f"|format(sentiment_result.scores.pos) }}</label>
-                                    <div class="score-bar">
-                                        <div class="score-fill positive-fill" style="width: {{ sentiment_result.scores.pos * 100 }}%"></div>
+
+                            <div class="col-md-6">
+                                <!-- Neutral Score -->
+                                <div class="metric-row">
+                                    <div class="metric-label">Neutral:</div>
+                                    <div class="flex-grow-1 mx-3">
+                                        <div class="sentiment-bar">
+                                            <div class="sentiment-fill bg-warning" style="width: {{ (sentiment.neutral * 100)|round(1) }}%">
+                                                <div class="sentiment-text">{{ (sentiment.neutral * 100)|round(1) }}%</div>
+                                            </div>
+                                        </div>
                                     </div>
+                                    <span class="score-badge bg-warning text-white">{{ sentiment.neutral|round(3) }}</span>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="fw-bold text-warning">Neutral: {{ "%.2f"|format(sentiment_result.scores.neu) }}</label>
-                                    <div class="score-bar">
-                                        <div class="score-fill neutral-fill" style="width: {{ sentiment_result.scores.neu * 100 }}%"></div>
+
+                                <!-- Compound Score -->
+                                <div class="metric-row">
+                                    <div class="metric-label">Compound:</div>
+                                    <div class="flex-grow-1 mx-3">
+                                        <div class="sentiment-bar">
+                                            <div class="sentiment-fill bg-{{ sentiment.color }}" style="width: {{ ((sentiment.compound + 1) * 50)|round(1) }}%">
+                                                <div class="sentiment-text">{{ (sentiment.compound * 100)|round(1) }}%</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="fw-bold text-danger">Negative: {{ "%.2f"|format(sentiment_result.scores.neg) }}</label>
-                                    <div class="score-bar">
-                                        <div class="score-fill negative-fill" style="width: {{ sentiment_result.scores.neg * 100 }}%"></div>
-                                    </div>
-                                </div>
-                                <div class="mb-0">
-                                    <label class="fw-bold text-primary">Compound Score: {{ "%.2f"|format(sentiment_result.scores.compound) }}</label>
-                                    <div class="score-bar">
-                                        <div class="score-fill {% if sentiment_result.scores.compound > 0 %}positive-fill{% elif sentiment_result.scores.compound < 0 %}negative-fill{% else %}neutral-fill{% endif %}" 
-                                             style="width: {{ ((sentiment_result.scores.compound + 1) / 2) * 100 }}%"></div>
-                                    </div>
+                                    <span class="score-badge bg-{{ sentiment.color }} text-white">{{ sentiment.compound|round(3) }}</span>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Explanation -->
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <strong>Compound Score:</strong> Ranges from -1 (most negative) to +1 (most positive). 
+                                Scores ≥ 0.05 are positive, ≤ -0.05 are negative, and between -0.05 and 0.05 are neutral.
+                            </small>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Generated Text -->
-                <div class="card">
-                    <div class="card-header bg-success text-white">
-                        <h5><i class="fas fa-robot me-2"></i>AI Generated Text</h5>
+
+                    <!-- AI Generated Text Card -->
+                    <div class="result-card generated-card">
+                        <h3 class="h4 mb-3">
+                            <i class="fas fa-robot text-primary me-2"></i>AI Generated Text
+                            <button class="copy-btn" onclick="copyText('generated-text')" title="Copy generated text">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </h3>
+                        <div class="generated-text" id="generated-text">
+                            {{ generated_text }}
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-magic me-1"></i>
+                                Generated using GPT-2 model based on your input text
+                            </small>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p class="lead">{{ generated_text }}</p>
-                        <small class="text-muted">
-                            <i class="fas fa-info-circle me-1"></i>
-                            Generated using GPT-2 model based on your input text
-                        </small>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center">
+                        <a href="/" class="btn btn-new-analysis btn-lg me-3">
+                            <i class="fas fa-plus me-2"></i>Analyze New Text
+                        </a>
+                        <button class="btn btn-outline-secondary btn-lg" onclick="window.print()">
+                            <i class="fas fa-print me-2"></i>Print Results
+                        </button>
                     </div>
-                </div>
-                
-                <!-- Back Button -->
-                <div class="text-center mt-4">
-                    <a href="{{ url_for('index') }}" class="btn btn-secondary btn-lg">
-                        <i class="fas fa-arrow-left me-2"></i>
-                        Analyze New Text
-                    </a>
+
+                    <!-- Footer -->
+                    <div class="text-center mt-5 pt-4 border-top">
+                        <p class="text-muted">
+                            <i class="fas fa-code me-1"></i>
+                            Analysis powered by <strong>NLTK VADER</strong> & <strong>GPT-2</strong>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- Toast for copy notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="copyToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-check-circle text-success me-2"></i>
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Text copied to clipboard!
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.
