@@ -3,979 +3,758 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice of Customer Analytics - Interactive Dashboard</title>
-    <!-- Modern Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Chart.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <title>AI Text Generation & Sentiment Analysis Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Global styles and variables */
         :root {
-            /* Light Theme */
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --background-gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text-dark: #333;
-            --text-light: #fff;
-            --positive: #2ecc71;
-            --neutral: #f39c12;
-            --negative: #e74c3c;
-            --shadow-light: rgba(0,0,0,0.1);
-            --shadow-medium: rgba(0,0,0,0.15);
-            --shadow-heavy: rgba(0,0,0,0.3);
-            --alert-info-bg: #d1ecf1;
-            --alert-info-border: #bee5eb;
-            --alert-info-text: #0c5460;
-            --alert-warning-bg: #fff3cd;
-            --alert-warning-border: #ffeaa7;
-            --alert-warning-text: #664d03;
-            --alert-danger-bg: #f8d7da;
-            --alert-danger-border: #f5c6cb;
-            --alert-danger-text: #58151c;
-            --input-bg: #fff;
-            --input-border: #e0e0e0;
-            --accordion-bg: #f8f9ff;
-        }
-
-        /* Dark Theme */
-        body.dark-mode {
-            --primary-color: #9f7aea;
-            --secondary-color: #6d28d9;
-            --background-gradient: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-            --card-bg: rgba(45, 55, 72, 0.95);
-            --text-dark: #e2e8f0;
-            --text-light: #1a202c;
-            --positive: #68d391;
-            --neutral: #f6ad55;
-            --negative: #f56565;
-            --shadow-light: rgba(0,0,0,0.2);
-            --shadow-medium: rgba(0,0,0,0.3);
-            --shadow-heavy: rgba(0,0,0,0.6);
-            --alert-info-bg: #2b3a4a;
-            --alert-info-border: #3c5469;
-            --alert-info-text: #b2e0e5;
-            --alert-warning-bg: #4a3c2b;
-            --alert-warning-border: #69543c;
-            --alert-warning-text: #ffeb95;
-            --alert-danger-bg: #4a2b2b;
-            --alert-danger-border: #693c3c;
-            --alert-danger-text: #f5c6cb;
-            --input-bg: #2d3748;
-            --input-border: #4a5568;
-            --accordion-bg: #2d3748;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-bg: #1a1a2e;
+            --card-bg: #16213e;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--background-gradient);
-            min-height: 100vh;
-            color: var(--text-dark);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            transition: background 0.5s ease, color 0.5s ease;
+            background: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Header section styling */
-        .header {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 40px var(--shadow-light);
-            text-align: center;
+        .hero-section {
+            background: var(--primary-gradient);
+            padding: 4rem 0;
+            margin-bottom: 3rem;
             position: relative;
+            overflow: hidden;
         }
 
-        .header h1 {
-            font-size: 2.8rem;
-            background: var(--background-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            color: var(--text-dark);
-            opacity: 0.8;
-            margin-bottom: 20px;
-        }
-
-        .role-badges {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            background: var(--background-gradient);
-            color: var(--text-light);
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        .dark-mode-toggle {
+        .hero-section::before {
+            content: '';
             position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="rgba(255,255,255,0.1)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            height: 100%;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .sentiment-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-bar {
+            border-radius: 10px;
+        }
+
+        .btn-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary-gradient {
+            background: var(--secondary-gradient);
+            border: none;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(240, 147, 251, 0.4);
+        }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 10px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #667eea;
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .result-box {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner-border {
+            color: #667eea;
+        }
+
+        .toast-container {
+            position: fixed;
             top: 20px;
             right: 20px;
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 10px var(--shadow-light);
-            transition: transform 0.3s ease, background-color 0.3s ease;
+            z-index: 1050;
         }
 
-        .dark-mode-toggle i {
-            color: var(--text-dark);
-            transition: color 0.3s ease;
+        .icon-feature {
+            font-size: 3rem;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
         }
 
-        .dark-mode-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        /* Card and Grid layout */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 15px 35px var(--shadow-light);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 50px var(--shadow-medium);
-        }
-
-        .card h3 {
-            color: var(--text-dark);
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-        }
-        
-        .card h3 i {
-            background: var(--background-gradient);
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: var(--success-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* Metric card specific styling */
-        .metric-card {
-            text-align: center;
-            background: var(--background-gradient);
-            color: var(--text-light);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
-            animation: scaleIn 0.8s ease-out;
-        }
+        .sentiment-positive { color: #28a745; }
+        .sentiment-negative { color: #dc3545; }
+        .sentiment-neutral { color: #ffc107; }
 
-        .metric-value {
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .metric-label {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .metric-trend {
-            font-size: 0.9rem;
-            margin-top: 10px;
-            opacity: 0.8;
-            font-weight: 500;
-        }
-
-        /* Controls and Buttons */
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .form-control {
-            flex-grow: 1;
-            min-width: 150px;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 12px 20px;
-            border: 2px solid var(--input-border);
-            border-radius: 12px;
-            font-size: 1rem;
+        .nav-pills .nav-link {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 50px;
             transition: all 0.3s ease;
-            background-color: var(--input-bg);
-            color: var(--text-dark);
         }
 
-        select:focus, input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        button {
-            background: var(--background-gradient);
-            color: var(--text-light);
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            border-radius: 12px;
-            padding: 12px 20px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        .nav-pills .nav-link.active {
+            background: var(--primary-gradient);
+            color: white;
         }
 
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        button .loading-icon {
-            animation: spin 1s linear infinite;
-        }
-
-        /* Ripple effect for buttons */
-        .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            transform: scale(0);
-            animation: ripple-effect 0.6s linear;
-        }
-
-        /* Accordion styles */
-        .accordion-item {
-            margin-bottom: 15px;
-            background: var(--accordion-bg);
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border-left: 4px solid var(--primary-color);
-            transition: border-left-color 0.3s ease;
-        }
-
-        .accordion-header {
-            padding: 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.2s ease;
-        }
-
-        .accordion-header:hover {
-            background-color: rgba(102, 126, 234, 0.05);
-        }
-
-        .accordion-header h4 {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .accordion-icon {
-            transition: transform 0.3s ease;
-        }
-        
-        .accordion-item.active .accordion-icon {
-            transform: rotate(180deg);
-        }
-
-        .accordion-content {
-            padding: 0 20px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-
-        .accordion-item.active .accordion-content {
-            padding: 20px;
-            max-height: 500px; /* Adjust to a value larger than content */
-        }
-        
-        .priority-high { border-left-color: var(--negative); }
-        .priority-medium { border-left-color: var(--neutral); }
-        .priority-low { border-left-color: var(--positive); }
-
-        .request-item {
-            background: var(--accordion-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.2s ease;
-        }
-
-        .request-item:hover {
-            background-color: var(--input-border);
-        }
-
-        .request-priority {
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: var(--text-light);
-        }
-
-        .canvas-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 20px;
-        }
-        
-        .footer-card {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            color: var(--text-light);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            transition: all 0.5s ease;
-        }
-        
-        .footer-card h4 {
-            color: var(--text-light);
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-        
-        /* Alert boxes */
-        .alert {
-            border-left: 5px solid;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .alert.alert-warning {
-            background: var(--alert-warning-bg);
-            border-color: var(--alert-warning-border);
-            color: var(--alert-warning-text);
-        }
-        .alert.alert-danger {
-            background: var(--alert-danger-bg);
-            border-color: var(--alert-danger-border);
-            color: var(--alert-danger-text);
-        }
-        .alert.alert-info {
-            background: var(--alert-info-bg);
-            border-color: var(--alert-info-border);
-            color: var(--alert-info-text);
-        }
-        
-        /* Toast Notifications */
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .toast {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 15px 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 250px;
-            max-width: 350px;
-            transform: translateX(120%);
-            animation: toast-slide-in 0.5s forwards cubic-bezier(0.2, 0.6, 0.2, 1);
-            transition: all 0.3s ease;
-            opacity: 0;
-        }
-
-        .toast.hide {
-            animation: toast-slide-out 0.5s forwards cubic-bezier(0.8, 0.4, 0.8, 0.2);
-        }
-
-        .toast .icon {
-            font-size: 1.5rem;
-        }
-        .toast.success .icon { color: var(--positive); }
-        .toast.info .icon { color: var(--primary-color); }
-        .toast.error .icon { color: var(--negative); }
-
-        /* Keyframe animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes scaleIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes ripple-effect {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-        
-        @keyframes toast-slide-in {
-            from { opacity: 0; transform: translateX(120%); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes toast-slide-out {
-            from { opacity: 1; transform: translateX(0); }
-            to { opacity: 0; transform: translateX(120%); }
-        }
-        
-        /* Responsive design */
         @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
+            .hero-section {
+                padding: 2rem 0;
             }
-            .header h1 {
-                font-size: 2rem;
+            
+            .feature-card {
+                margin-bottom: 2rem;
             }
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            select, button {
-                width: 100%;
-            }
-            .dark-mode-toggle {
-                top: 10px;
-                right: 10px;
-                width: 35px;
-                height: 35px;
-            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+        }
+
+        .result-container {
+            position: relative;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Voice of Customer Analytics Platform</h1>
-            <p>Transforming 50K+ Customer Reviews into Actionable Business Intelligence</p>
-            <div class="role-badges">
-                <span class="badge">Data Scientist</span>
-                <span class="badge">Business Analyst</span>
-                <span class="badge">Team Lead</span>
-            </div>
-            <div id="darkModeToggle" class="dark-mode-toggle" onclick="toggleDarkMode()">
-                <i class="fas fa-moon"></i>
-            </div>
-        </div>
-
-        <div class="dashboard-grid">
-            <div class="metric-card">
-                <div class="metric-value" id="totalReviews">52,847</div>
-                <div class="metric-label">Total Reviews Processed</div>
-                <div class="metric-trend">↗ +12% this month</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value" id="accuracy">87.3%</div>
-                <div class="metric-label">Sentiment Accuracy</div>
-                <div class="metric-trend">↗ +2.3% improvement</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value" id="insights">34</div>
-                <div class="metric-label">Actionable Insights</div>
-                <div class="metric-trend">→ 28 implemented</div>
-            </div>
-        </div>
-
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3><i class="fas fa-chart-pie"></i> Sentiment Distribution</h3>
-                <div class="sentiment-distribution">
-                    <div class="sentiment-item positive">
-                        <div style="font-size: 1.8rem; font-weight: bold; color: var(--positive);">64.2%</div>
-                        <div style="color: var(--text-dark);">Positive</div>
-                    </div>
-                    <div class="sentiment-item neutral">
-                        <div style="font-size: 1.8rem; font-weight: bold; color: var(--neutral);">21.5%</div>
-                        <div style="color: var(--text-dark);">Neutral</div>
-                    </div>
-                    <div class="sentiment-item negative">
-                        <div style="font-size: 1.8rem; font-weight: bold; color: var(--negative);">14.3%</div>
-                        <div style="color: var(--text-dark);">Negative</div>
-                    </div>
+    <!-- Toast Container -->
+    <div class="toast-container">
+        <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span id="toastMessage">Success!</span>
                 </div>
-                <div class="controls">
-                    <div class="form-control">
-                        <select id="timeFilter">
-                            <option>Last 30 days</option>
-                            <option>Last 3 months</option>
-                            <option>Last 6 months</option>
-                        </select>
-                    </div>
-                    <button id="refreshButton" onclick="updateSentimentData(event)">
-                        <span class="button-text">Refresh Data</span>
-                        <i class="fas fa-sync-alt loading-icon" style="display: none;"></i>
-                    </button>
-                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
-
-            <div class="card">
-                <h3><i class="fas fa-chart-line"></i> Sentiment Trends</h3>
-                <div class="canvas-container">
-                    <canvas id="sentimentChart"></canvas>
-                </div>
-                <p style="font-size: 0.9rem; color: var(--text-dark); opacity: 0.7; margin-top: 10px;">
-                    <strong>Business Impact:</strong> 15% improvement in customer satisfaction after addressing negative sentiment drivers
-                </p>
-            </div>
-        </div>
-
-        <div class="insights-section">
-            <h2><i class="fas fa-bullseye"></i> Strategic Insights & Business Intelligence</h2>
-            <div class="dashboard-grid">
-                <div>
-                    <h4 style="margin-bottom: 15px; color: var(--text-dark);">Top Pain Points (Leadership Priority)</h4>
-                    <div class="accordion-item priority-high">
-                        <div class="accordion-header" onclick="toggleAccordion(this)">
-                            <span><strong>Mobile App Performance</strong></span>
-                            <i class="fas fa-chevron-down accordion-icon"></i>
-                        </div>
-                        <div class="accordion-content">
-                            <p><small>Mentioned in 23% of negative reviews | Impact: High | Team: Mobile Dev</small></p>
-                            <p style="margin-top: 10px;">Detailed analysis shows crashes on iOS 17 and slow loading on Android devices. An immediate patch is required.</p>
-                        </div>
-                    </div>
-                    <div class="accordion-item priority-high">
-                        <div class="accordion-header" onclick="toggleAccordion(this)">
-                            <span><strong>Customer Support Response Time</strong></span>
-                            <i class="fas fa-chevron-down accordion-icon"></i>
-                        </div>
-                        <div class="accordion-content">
-                            <p><small>Average complaint: 48+ hours | Impact: Critical | Team: Support</small></p>
-                            <p style="margin-top: 10px;">Customer feedback highlights frustration with long wait times. We're recommending a new chatbot and hiring two new support agents to mitigate this.</p>
-                        </div>
-                    </div>
-                    <div class="accordion-item priority-medium">
-                        <div class="accordion-header" onclick="toggleAccordion(this)">
-                            <span><strong>Payment Process Friction</strong></span>
-                            <i class="fas fa-chevron-down accordion-icon"></i>
-                        </div>
-                        <div class="accordion-content">
-                            <p><small>12% abandonment rate | Impact: Revenue | Team: Product</small></p>
-                            <p style="margin-top: 10px;">Users are dropping off at the payment stage. Investigating a simplified 1-click checkout option and integration with more payment providers.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 style="margin-bottom: 15px; color: var(--text-dark);">Feature Request Pipeline</h4>
-                    <div class="feature-requests">
-                        <div class="request-item">
-                            <div>
-                                <strong>Dark Mode Interface</strong><br>
-                                <small>Requested by 2,847 users</small>
-                            </div>
-                            <span class="request-priority" style="background: var(--negative);">High Priority</span>
-                        </div>
-                        <div class="request-item">
-                            <div>
-                                <strong>Advanced Search Filters</strong><br>
-                                <small>Requested by 1,923 users</small>
-                            </div>
-                            <span class="request-priority" style="background: var(--neutral);">Medium Priority</span>
-                        </div>
-                        <div class="request-item">
-                            <div>
-                                <strong>Offline Mode Support</strong><br>
-                                <small>Requested by 1,456 users</small>
-                            </div>
-                            <span class="request-priority" style="background: var(--neutral);">Medium Priority</span>
-                        </div>
-                        <div class="request-item">
-                            <div>
-                                <strong>Social Media Integration</strong><br>
-                                <small>Requested by 876 users</small>
-                            </div>
-                            <span class="request-priority" style="background: var(--positive);">Low Priority</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3><i class="fas fa-bell"></i> Real-time Issue Detection</h3>
-                <div class="alert alert-warning">
-                    <strong><i class="fas fa-exclamation-triangle"></i> Alert Triggered:</strong> Spike in "login issues" mentioned 47 times in last 2 hours
-                </div>
-                <div class="alert alert-danger">
-                    <strong><i class="fas fa-times-circle"></i> Critical:</strong> Payment gateway complaints increased 340% since yesterday
-                </div>
-                <div class="alert alert-info">
-                    <strong><i class="fas fa-check-circle"></i> Positive Trend:</strong> "Easy to use" mentions up 28% after UI update
-                </div>
-                <button onclick="generateReport(event)" style="margin-top: 15px; width: 100%;">Generate Detailed Report</button>
-            </div>
-
-            <div class="card">
-                <h3><i class="fas fa-microchip"></i> NLP Model Performance</h3>
-                <div class="canvas-container">
-                    <canvas id="accuracyChart"></canvas>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.9rem; color: var(--text-dark); opacity: 0.8;">
-                    <span><strong>Precision:</strong> 89.1%</span>
-                    <span><strong>Recall:</strong> 85.7%</span>
-                    <span><strong>F1-Score:</strong> 87.3%</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-card">
-            <h4>Technology Stack & Business Impact</h4>
-            <p style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">
-                <strong>Tech Stack:</strong> Python (NLTK, spaCy, scikit-learn), SQL Server, Power BI, Azure ML<br>
-                <strong>Business Results:</strong> 23% reduction in churn, 15% increase in NPS, $2.3M revenue impact from feature prioritization<br>
-                <strong>Team Leadership:</strong> Led cross-functional team of 8 data scientists and analysts, established data-driven product culture
-            </p>
         </div>
     </div>
 
-    <!-- Toast container -->
-    <div id="toast-container"></div>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container hero-content">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="display-4 fw-bold mb-4 fade-in">
+                        <i class="fas fa-robot me-3"></i>
+                        AI-Powered Text Analytics Dashboard
+                    </h1>
+                    <p class="lead mb-4 fade-in">
+                        Advanced sentiment analysis and intelligent text generation powered by state-of-the-art AI models
+                    </p>
+                    <div class="row text-center fade-in">
+                        <div class="col-md-4">
+                            <div class="stats-number">99.2%</div>
+                            <p>Accuracy Rate</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-number">50K+</div>
+                            <p>Texts Analyzed</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-number">24/7</div>
+                            <p>AI Processing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Feature Cards -->
+        <div class="row mb-5">
+            <div class="col-md-6 mb-4">
+                <div class="feature-card fade-in">
+                    <div class="feature-card-content">
+                        <div class="icon-feature">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Sentiment Analysis</h3>
+                        <p class="mb-0">Comprehensive sentiment scoring using Gemini's multimodal capabilities with detailed positive, negative, neutral, and compound metrics.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="feature-card fade-in">
+                    <div class="feature-card-content">
+                        <div class="icon-feature">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <h3 class="h4 mb-3">AI Text Generation</h3>
+                        <p class="mb-0">Context-aware text generation using advanced language models with customizable parameters for creative output.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-pills justify-content-center mb-4" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active me-2" id="sentiment-tab" data-bs-toggle="pill" data-bs-target="#sentiment-panel" type="button" role="tab">
+                    <i class="fas fa-chart-pie me-2"></i>Sentiment Analysis
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="generation-tab" data-bs-toggle="pill" data-bs-target="#generation-panel" type="button" role="tab">
+                    <i class="fas fa-pen-fancy me-2"></i>Text Generation
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="mainTabContent">
+            <!-- Sentiment Analysis Panel -->
+            <div class="tab-pane fade show active" id="sentiment-panel" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="result-box">
+                            <h4 class="mb-4">
+                                <i class="fas fa-comments text-primary me-2"></i>
+                                Analyze Text Sentiment
+                            </h4>
+                            <form id="sentimentForm">
+                                <div class="mb-3">
+                                    <label for="sentimentText" class="form-label">Enter text to analyze</label>
+                                    <textarea class="form-control" id="sentimentText" rows="6" placeholder="Type or paste your text here for sentiment analysis..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-gradient w-100">
+                                    <i class="fas fa-search me-2"></i>Analyze Sentiment
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div id="sentimentLoading" class="loading-spinner">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Analyzing...</span>
+                            </div>
+                            <p class="mt-3">Analyzing sentiment...</p>
+                        </div>
+                        <div id="sentimentResults" style="display: none;">
+                            <h5 class="mb-4">
+                                <i class="fas fa-chart-bar text-success me-2"></i>
+                                Analysis Results
+                            </h5>
+                            <div id="sentimentCards"></div>
+                            <div class="result-container">
+                                <div class="result-box mt-3">
+                                    <h6>Overall Sentiment</h6>
+                                    <div id="overallSentiment" class="h4"></div>
+                                </div>
+                                <button class="btn btn-secondary-gradient btn-sm copy-btn" onclick="copyResults('sentiment')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Text Generation Panel -->
+            <div class="tab-pane fade" id="generation-panel" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="result-box">
+                            <h4 class="mb-4">
+                                <i class="fas fa-robot text-primary me-2"></i>
+                                AI Text Generator
+                            </h4>
+                            <form id="generationForm">
+                                <div class="mb-3">
+                                    <label for="generationPrompt" class="form-label">Enter prompt or starting text</label>
+                                    <textarea class="form-control" id="generationPrompt" rows="4" placeholder="Start typing your prompt or idea..." required></textarea>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="maxLength" class="form-label">Max Length</label>
+                                        <select class="form-select" id="maxLength">
+                                            <option value="50">Short (50 words)</option>
+                                            <option value="100" selected>Medium (100 words)</option>
+                                            <option value="200">Long (200 words)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="creativity" class="form-label">Creativity Level</label>
+                                        <select class="form-select" id="creativity">
+                                            <option value="0.7">Conservative</option>
+                                            <option value="0.8" selected>Balanced</option>
+                                            <option value="0.9">Creative</option>
+                                            <option value="1.0">Very Creative</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-gradient w-100">
+                                    <i class="fas fa-magic me-2"></i>Generate Text
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div id="generationLoading" class="loading-spinner">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Generating...</span>
+                            </div>
+                            <p class="mt-3">Generating creative text...</p>
+                        </div>
+                        <div id="generationResults" style="display: none;">
+                            <div class="result-container">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-file-alt text-success me-2"></i>
+                                    Generated Text
+                                </h5>
+                                <div class="result-box">
+                                    <div id="generatedText"></div>
+                                </div>
+                                <button class="btn btn-secondary-gradient btn-sm copy-btn" onclick="copyResults('generation')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <button class="btn btn-outline-light mt-3 w-100" onclick="regenerateText()">
+                                <i class="fas fa-redo me-2"></i>Regenerate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Information -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="result-box">
+                    <h4 class="mb-3">
+                        <i class="fas fa-code text-primary me-2"></i>
+                        API Integration
+                    </h4>
+                    <p>This dashboard now connects to the **Gemini 2.5 Flash API** for real-time text generation and analysis.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 mt-5">
+        <div class="container">
+            <p class="text-muted">&copy; 2025 AI Text Analytics Dashboard. Powered by Gemini.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Initialize charts and data
-        let sentimentChart, accuracyChart;
-        
-        // Helper function to add ripple effect to buttons
-        function createRipple(event) {
-            const button = event.currentTarget;
-            const circle = document.createElement('span');
-            const diameter = Math.max(button.clientWidth, button.clientHeight);
-            const radius = diameter / 2;
+        // Set the API key
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-            circle.style.width = circle.style.height = `${diameter}px`;
-            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
-            circle.classList.add('ripple');
-
-            const oldRipple = button.getElementsByClassName('ripple')[0];
-            if (oldRipple) {
-                oldRipple.remove();
+        // Utility function to show a toast message
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('successToast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            if (type === 'error') {
+                toast.classList.remove('bg-success');
+                toast.classList.add('bg-danger');
+            } else {
+                toast.classList.remove('bg-danger');
+                toast.classList.add('bg-success');
             }
-
-            button.appendChild(circle);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
         }
 
-        document.querySelectorAll('button').forEach(button => {
-            button.addEventListener('click', createRipple);
+        // Utility function for exponential backoff
+        async function fetchWithBackoff(url, options, maxRetries = 5, retryDelay = 1000) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.status === 429) { // Too many requests
+                        console.warn(`API call failed with status 429. Retrying in ${retryDelay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, retryDelay));
+                        retryDelay *= 2;
+                        continue;
+                    }
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response;
+                } catch (error) {
+                    if (i === maxRetries - 1) {
+                        console.error('Max retries exceeded.', error);
+                        throw error;
+                    }
+                    console.warn(`Fetch attempt failed. Retrying in ${retryDelay / 1000}s...`);
+                    await new Promise(resolve => setTimeout(resolve, retryDelay));
+                    retryDelay *= 2;
+                }
+            }
+            throw new Error('Failed to fetch after multiple retries.');
+        }
+
+        // Asynchronous function to handle sentiment analysis using Gemini API
+        async function analyzeSentiment(text) {
+            const prompt = `Analyze the sentiment of the following text. Provide a single JSON object with the following fields: "positive" (for positive sentiment score), "negative" (for negative sentiment score), "neutral" (for neutral sentiment score), and "compound" (for an overall compound score). Each score should be a number between 0.0 and 1.0. The text to analyze is: ${text}`;
+            
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "positive": { "type": "NUMBER" },
+                            "negative": { "type": "NUMBER" },
+                            "neutral": { "type": "NUMBER" },
+                            "compound": { "type": "NUMBER" }
+                        },
+                        "propertyOrdering": ["positive", "negative", "neutral", "compound"]
+                    }
+                }
+            };
+
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+
+            try {
+                const response = await fetchWithBackoff(apiUrl, options);
+                const result = await response.json();
+                
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!jsonText) {
+                    throw new Error('API response is missing content.');
+                }
+                const parsedResult = JSON.parse(jsonText);
+                return parsedResult;
+            } catch (error) {
+                console.error('Error in sentiment analysis:', error);
+                showToast('Failed to analyze sentiment. Please try again.', 'error');
+                throw error;
+            }
+        }
+
+        // Asynchronous function to handle text generation using Gemini API
+        async function generateText(prompt, maxLength, creativity) {
+            const generationPrompt = `Generate a text of approximately ${maxLength} words based on the following prompt: "${prompt}"`;
+            
+            const payload = {
+                contents: [{
+                    parts: [{ text: generationPrompt }]
+                }],
+                generationConfig: {
+                    temperature: parseFloat(creativity)
+                }
+            };
+            
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+
+            try {
+                const response = await fetchWithBackoff(apiUrl, options);
+                const result = await response.json();
+                const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!generatedText) {
+                    throw new Error('API response is missing generated text.');
+                }
+                return generatedText;
+            } catch (error) {
+                console.error('Error in text generation:', error);
+                showToast('Failed to generate text. Please try again.', 'error');
+                throw error;
+            }
+        }
+
+        // Sentiment Analysis Form Handler
+        document.getElementById('sentimentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const text = document.getElementById('sentimentText').value.trim();
+            
+            if (!text) return;
+            
+            document.getElementById('sentimentLoading').style.display = 'block';
+            document.getElementById('sentimentResults').style.display = 'none';
+            
+            try {
+                const results = await analyzeSentiment(text);
+                displaySentimentResults(results);
+                
+                document.getElementById('sentimentLoading').style.display = 'none';
+                document.getElementById('sentimentResults').style.display = 'block';
+            } catch (error) {
+                document.getElementById('sentimentLoading').style.display = 'none';
+            }
         });
 
-        // Function to show a loading state for buttons
-        function setLoading(button, isLoading) {
-            const buttonText = button.querySelector('.button-text');
-            let loadingIcon = button.querySelector('.loading-icon');
-
-            if (!loadingIcon) {
-                loadingIcon = document.createElement('i');
-                loadingIcon.classList.add('fas', 'fa-sync-alt', 'loading-icon');
-                loadingIcon.style.display = 'none';
-                button.appendChild(loadingIcon);
-            }
-
-            if (isLoading) {
-                buttonText.style.display = 'none';
-                loadingIcon.style.display = 'inline-block';
-                button.disabled = true;
-                button.style.cursor = 'not-allowed';
-            } else {
-                buttonText.style.display = 'inline-block';
-                loadingIcon.style.display = 'none';
-                button.disabled = false;
-                button.style.cursor = 'pointer';
-            }
-        }
-
-        // Custom toast notification functions
-        function showToast(message, type = 'info', duration = 3000) {
-            const toastContainer = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.classList.add('toast', type);
-
-            let iconClass = '';
-            if (type === 'success') {
-                iconClass = 'fa-check-circle';
-            } else if (type === 'error') {
-                iconClass = 'fa-exclamation-circle';
-            } else {
-                iconClass = 'fa-info-circle';
-            }
-
-            toast.innerHTML = `<i class="fas ${iconClass} icon"></i><span>${message}</span>`;
-            toastContainer.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.add('hide');
-                toast.addEventListener('animationend', () => toast.remove());
-            }, duration);
-        }
-
-        // Toggle Dark Mode
-        function toggleDarkMode() {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
-            const isDarkMode = body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
-            const toggleIcon = document.getElementById('darkModeToggle').querySelector('i');
-            if (isDarkMode) {
-                toggleIcon.classList.remove('fa-moon');
-                toggleIcon.classList.add('fa-sun');
-            } else {
-                toggleIcon.classList.remove('fa-sun');
-                toggleIcon.classList.add('fa-moon');
-            }
-            // Update charts colors on theme change
-            if (sentimentChart) sentimentChart.destroy();
-            if (accuracyChart) accuracyChart.destroy();
-            initializeCharts();
-        }
-
-        // Accordion functionality
-        function toggleAccordion(header) {
-            const item = header.closest('.accordion-item');
-            item.classList.toggle('active');
-        }
-
-        // Initialize dashboard
-        function initializeDashboard() {
-            // Apply dark mode if user's preference is saved
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('darkModeToggle').querySelector('i').classList.remove('fa-moon');
-                document.getElementById('darkModeToggle').querySelector('i').classList.add('fa-sun');
-            }
-            initializeCharts();
-            simulateRealTimeUpdates();
-        }
-
-        function initializeCharts() {
-            createSentimentChart();
-            createAccuracyChart();
-        }
-
-        function createSentimentChart() {
-            const ctx = document.getElementById('sentimentChart').getContext('2d');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const textColor = isDarkMode ? 'var(--text-dark)' : '#666';
-            const gridColor = isDarkMode ? '#4a5568' : '#e0e0e0';
-
-            sentimentChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Positive',
-                        data: [58, 62, 65, 63, 66, 64],
-                        borderColor: 'var(--positive)',
-                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                        tension: 0.4
-                    }, {
-                        label: 'Negative',
-                        data: [18, 16, 15, 17, 14, 14],
-                        borderColor: 'var(--negative)',
-                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                        tension: 0.4
-                    }, {
-                        label: 'Neutral',
-                        data: [24, 22, 20, 20, 20, 22],
-                        borderColor: 'var(--neutral)',
-                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                color: textColor,
-                                font: {
-                                    family: 'Inter'
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { color: gridColor },
-                            ticks: {
-                                color: textColor,
-                                font: {
-                                    family: 'Inter'
-                                }
-                            }
-                        },
-                        x: {
-                            grid: { color: gridColor },
-                            ticks: {
-                                color: textColor,
-                                font: {
-                                    family: 'Inter'
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createAccuracyChart() {
-            const ctx = document.getElementById('accuracyChart').getContext('2d');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const textColor = isDarkMode ? 'var(--text-dark)' : '#666';
-            const correctColor = isDarkMode ? '#68d391' : 'var(--primary-color)';
-            const incorrectColor = isDarkMode ? '#4a5568' : '#e0e6ff';
-
-            accuracyChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Correct Predictions', 'Incorrect Predictions'],
-                    datasets: [{
-                        data: [87.3, 12.7],
-                        backgroundColor: [correctColor, incorrectColor],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: textColor,
-                                font: {
-                                    family: 'Inter'
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateSentimentData(event) {
-            const button = event.target;
-            setLoading(button, true);
+        // Text Generation Form Handler
+        document.getElementById('generationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const prompt = document.getElementById('generationPrompt').value.trim();
+            const maxLength = document.getElementById('maxLength').value;
+            const creativity = document.getElementById('creativity').value;
             
-            setTimeout(() => {
-                document.getElementById('totalReviews').textContent = (Math.floor(Math.random() * 1000) + 52000).toLocaleString();
-                document.getElementById('accuracy').textContent = (87 + Math.random() * 3).toFixed(1) + '%';
-                document.getElementById('insights').textContent = Math.floor(Math.random() * 10) + 30;
+            if (!prompt) return;
+            
+            document.getElementById('generationLoading').style.display = 'block';
+            document.getElementById('generationResults').style.display = 'none';
+            
+            try {
+                const generatedText = await generateText(prompt, maxLength, creativity);
+                document.getElementById('generatedText').innerHTML = `<p>${generatedText}</p>`;
                 
-                showToast('Dashboard data refreshed successfully!', 'success');
-                setLoading(button, false);
-            }, 1500);
-        }
+                document.getElementById('generationLoading').style.display = 'none';
+                document.getElementById('generationResults').style.display = 'block';
+            } catch (error) {
+                document.getElementById('generationLoading').style.display = 'none';
+            }
+        });
 
-        function generateReport(event) {
-            const button = event.target;
-            setLoading(button, true);
+        function displaySentimentResults(results) {
+            const cardsContainer = document.getElementById('sentimentCards');
+            const overallContainer = document.getElementById('overallSentiment');
             
-            setTimeout(() => {
-                showToast('Executive report generated and sent to stakeholders.', 'info');
-                setLoading(button, false);
-            }, 2000);
+            // Determine overall sentiment based on the compound score
+            let overall = 'Neutral';
+            let overallClass = 'sentiment-neutral';
+            if (results.compound >= 0.05) {
+                overall = 'Positive';
+                overallClass = 'sentiment-positive';
+            } else if (results.compound <= -0.05) {
+                overall = 'Negative';
+                overallClass = 'sentiment-negative';
+            }
+            
+            // Create sentiment cards
+            const cards = [
+                { label: 'Positive', value: results.positive, color: 'success', icon: 'smile' },
+                { label: 'Negative', value: results.negative, color: 'danger', icon: 'frown' },
+                { label: 'Neutral', value: results.neutral, color: 'warning', icon: 'meh' },
+                { label: 'Compound', value: Math.abs(results.compound), color: 'info', icon: 'chart-line' }
+            ];
+            
+            cardsContainer.innerHTML = cards.map(card => `
+                <div class="sentiment-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span><i class="fas fa-${card.icon} me-2"></i>${card.label}</span>
+                        <strong>${(card.value * 100).toFixed(1)}%</strong>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-${card.color}" style="width: ${card.value * 100}%"></div>
+                    </div>
+                </div>
+            `).join('');
+            
+            overallContainer.innerHTML = `<span class="${overallClass}"><i class="fas fa-${overall === 'Positive' ? 'thumbs-up' : overall === 'Negative' ? 'thumbs-down' : 'minus-circle'} me-2"></i>${overall}</span>`;
         }
 
-        function simulateRealTimeUpdates() {
-            setInterval(() => {
-                const reviews = document.getElementById('totalReviews');
-                let currentValue = parseInt(reviews.textContent.replace(/,/g, ''));
-                const newValue = (currentValue + Math.floor(Math.random() * 5)).toLocaleString();
-                reviews.textContent = newValue;
-                showToast(`New reviews processed. Total: ${newValue}`, 'info', 2000);
-            }, 30000);
+        async function regenerateText() {
+            const prompt = document.getElementById('generationPrompt').value.trim();
+            const maxLength = document.getElementById('maxLength').value;
+            const creativity = document.getElementById('creativity').value;
+            
+            if (!prompt) return;
+            
+            document.getElementById('generationLoading').style.display = 'block';
+            document.getElementById('generationResults').style.display = 'none';
+            
+            try {
+                const generatedText = await generateText(prompt, maxLength, creativity);
+                document.getElementById('generatedText').innerHTML = `<p>${generatedText}</p>`;
+                
+                document.getElementById('generationLoading').style.display = 'none';
+                document.getElementById('generationResults').style.display = 'block';
+            } catch (error) {
+                document.getElementById('generationLoading').style.display = 'none';
+            }
         }
 
-        // Initialize the dashboard when page loads
-        document.addEventListener('DOMContentLoaded', initializeDashboard);
+        function copyResults(type) {
+            let textToCopy = '';
+            
+            if (type === 'sentiment') {
+                const results = document.getElementById('sentimentResults');
+                if (results.style.display !== 'none') {
+                    const cards = results.querySelectorAll('.sentiment-card');
+                    const overall = document.getElementById('overallSentiment').textContent;
+                    
+                    textToCopy = `Sentiment Analysis Results:\n`;
+                    cards.forEach(card => {
+                        const label = card.querySelector('span').textContent;
+                        const value = card.querySelector('strong').textContent;
+                        textToCopy += `${label}: ${value}\n`;
+                    });
+                    textToCopy += `Overall Sentiment: ${overall}`;
+                }
+            } else if (type === 'generation') {
+                const generatedText = document.getElementById('generatedText').textContent;
+                textToCopy = generatedText;
+            }
+            
+            if (textToCopy) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        showToast('Content copied to clipboard!');
+                    }).catch(() => {
+                        showToast('Failed to copy content.', 'error');
+                    });
+                } else {
+                    // Fallback for older browsers
+                    const textArea = document.createElement("textarea");
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showToast('Content copied to clipboard!');
+                    } catch (err) {
+                        showToast('Failed to copy content.', 'error');
+                    }
+                    document.body.removeChild(textArea);
+                }
+            }
+        }
+
+        // Initial fade-in animations on load
+        window.onload = function() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                el.classList.add('show');
+            });
+        };
     </script>
 </body>
 </html>
